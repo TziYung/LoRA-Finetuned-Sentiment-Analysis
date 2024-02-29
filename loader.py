@@ -6,7 +6,7 @@ def process_data(table_path, tkzr,
     text_column = 0, label_column = -1,
     max_len = 300, train_ratio = 0.8
     ):
-    table = pd.read_parquet(table_path).iloc[:100]
+    table = pd.read_parquet(table_path)
     text = table.iloc[:, text_column].to_list()
     text = tkzr(text, max_length = max_len, truncation = True, padding = True) 
     if label_column is None:
