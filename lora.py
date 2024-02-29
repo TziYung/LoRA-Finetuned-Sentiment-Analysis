@@ -87,7 +87,7 @@ class GPUMemoryCallback(tf.keras.callbacks.Callback):
         self.labels = []
 
     def _compute_memory_usage(self):
-        memory_stats = tf.config.experimental.get_memory_info("CPU:0")
+        memory_stats = tf.config.experimental.get_memory_info("GPU:0")
         # Convert bytes to GB and store in list.
         peak_usage = round(memory_stats["peak"] / (2**30), 3)
         self.memory_usage.append(peak_usage)
