@@ -9,6 +9,7 @@ def process_data(table_path, tkzr,
     table = pd.read_parquet(table_path)
     text = table.iloc[:, text_column].to_list()
     text = tkzr(text, max_length = max_len, truncation = True, padding = True) 
+    text = dict(text)
     if label_column is None:
         data = tf.data.Dataset.from_tensor_slices(text)
     else:

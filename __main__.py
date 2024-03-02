@@ -12,10 +12,11 @@ if __name__ == "__main__":
     train_data = train_data.batch(32)
     val_data = val_data.batch(32)
     test_data, _  = process_data("test-00000-of-00001.parquet", tkzr, train_ratio = 1.0)
+    test_data = test_data.batch(32)
 
     # The batch number that we want to observe memory comsume
 
-    batch_list = [5 * n for n in range(10)]
+    batch_list = [1 * n for n in range(10)]
 
     # Monitor the consumption of vram
     vanila_tracker = GPUMemoryCallback(batch_list)
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     model = TFDistilBertForSequenceClassification.from_pretrained(MODEL_NAME)
     model.summary()
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
-    model.fit(train_data, validation_data = val_data, batch_size = 1, epochs = 100), callbacks = [vanila_tracker])
+    model.fit(train_data, epochs = 10, callbacks = [vanila_tracker])
     loss, acc = model.evaluate(test_data)
 
     # Lora finetune
@@ -42,6 +43,7 @@ if __name__ == "__main__":
     id_, mask = tkzr("Hello World", padding = True , max_length = 250, truncation = True).values()
     id_ = np.array(id_)
     mask = np.array(mask)
+    model(id_, mask)
     for layer in model._flatten_layers():
         list_of_sublayers = list(layer._flatten_layers())
         if len(list_of_sublayers) == 1:  # "leaves of the model"
@@ -61,7 +63,15 @@ if __name__ == "__main__":
                 layer.trainable = False
             
     model.summary()
-
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
-    model.fit(train_data, validation_data = val_data, epochs = 100) , callbacks = [lora_tracker])
+    model.fit(train_data, epochs = 10 , callbacks = [lora_tracker])
     loss, acc = model.evaluate(test_data)
+
+    from matplotlib import pyplot as plt 
+    plt.plot([n for n in range(len(vanila_tracker.memory_usage))], vanila_tracker.memory_usage)
+    plt.plot([n for n in range(len(lora_tracker.memory_usage))], lora_tracker.memory_usage)
+    plt.legend(["Vanila", "LoRA"])
+    
+    plt.show()
+
+
