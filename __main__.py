@@ -12,6 +12,8 @@ if __name__ == "__main__":
     train_data = train_data.batch(32)
     val_data = val_data.batch(32)
     test_data, _  = process_data("test-00000-of-00001.parquet", tkzr, train_ratio = 1.0)
+    # Use a smaller batch size for better observation between lora and lora after merge
+    # Smaller batch size would lower the benefit from parrel computing.
     test_data = test_data.batch(4)
 
     # The batch number that we want to observe memory comsume
@@ -65,6 +67,12 @@ if __name__ == "__main__":
     model.summary()
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
     model.fit(train_data, epochs = 5 , callbacks = [lora_tracker])
+    loss, acc = model.evaluate(test_data)
+    for block in model.distilbert.transformer.layer:
+        block.attention.q_lin.merge()
+        block.attention.q_lin.trainable = False
+        block.attention.v_lin.merge()
+        block.attention.v_lin.trainable = False
     loss, acc = model.evaluate(test_data)
 
     from matplotlib import pyplot as plt 
