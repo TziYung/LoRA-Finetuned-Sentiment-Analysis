@@ -28,7 +28,7 @@ if __name__ == "__main__":
     model = TFDistilBertForSequenceClassification.from_pretrained(MODEL_NAME)
     model.summary()
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
-    model.fit(train_data, epochs = 10, callbacks = [vanila_tracker])
+    model.fit(train_data, epochs = 5, callbacks = [vanila_tracker])
     loss, acc = model.evaluate(test_data)
 
     # Lora finetune
@@ -64,7 +64,7 @@ if __name__ == "__main__":
             
     model.summary()
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
-    model.fit(train_data, epochs = 10 , callbacks = [lora_tracker])
+    model.fit(train_data, epochs = 5 , callbacks = [lora_tracker])
     loss, acc = model.evaluate(test_data)
 
     from matplotlib import pyplot as plt 
