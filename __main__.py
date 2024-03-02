@@ -12,7 +12,7 @@ if __name__ == "__main__":
     train_data = train_data.batch(32)
     val_data = val_data.batch(32)
     test_data, _  = process_data("test-00000-of-00001.parquet", tkzr, train_ratio = 1.0)
-    test_data = test_data.batch(32)
+    test_data = test_data.batch(4)
 
     # The batch number that we want to observe memory comsume
 
