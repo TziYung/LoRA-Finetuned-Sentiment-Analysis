@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     MODEL_NAME = "distilbert-base-uncased"
     tkzr = DistilBertTokenizer.from_pretrained(MODEL_NAME)
-    train_data, val_data = process_data("train-00000-of-00001.parquet", tkzr)
+    train_data, val_data = process_data("train-00000-of-00001.parquet", tkzr, train_ratio = 1.0)
     train_data = train_data.batch(32)
     val_data = val_data.batch(32)
     test_data, _  = process_data("test-00000-of-00001.parquet", tkzr, train_ratio = 1.0)
