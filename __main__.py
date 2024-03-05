@@ -70,9 +70,7 @@ if __name__ == "__main__":
     loss, acc = model.evaluate(test_data)
     for block in model.distilbert.transformer.layer:
         block.attention.q_lin.merge()
-        block.attention.q_lin.trainable = False
         block.attention.v_lin.merge()
-        block.attention.v_lin.trainable = False
     loss, acc = model.evaluate(test_data)
 
     from matplotlib import pyplot as plt 
