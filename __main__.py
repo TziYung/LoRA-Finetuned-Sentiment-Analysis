@@ -41,7 +41,7 @@ if __name__ == "__main__":
         "GPU:0"
     )
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
-    model.fit(train_data, epochs = 5, callbacks = [vanila_tracker])
+    model.fit(train_data, epochs = 10, callbacks = [vanila_tracker])
     loss, acc = model.evaluate(test_data)
 
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         "GPU:0"
     )
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
-    model.fit(train_data, epochs = 5 , callbacks = [lora_tracker])
+    model.fit(train_data, epochs = 10 , callbacks = [lora_tracker])
     loss, acc = model.evaluate(test_data)
     for block in model.distilbert.transformer.layer:
         block.attention.q_lin.merge()
