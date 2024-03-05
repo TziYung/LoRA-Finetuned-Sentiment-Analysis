@@ -45,8 +45,6 @@ class LoraLayer(tf.keras.layers.Layer):
             name=f"lora_B",
         )
 
-        self.is_merge = False
-        
     def call(self, input_):
         # While trainig, the original output is first compute then added 
         # with the lora output, which mean, while training, the latency 
@@ -57,21 +55,15 @@ class LoraLayer(tf.keras.layers.Layer):
             original_output = self.original_layer(input_)
             lora_output = self.B(self.A(input_)) * self._scale
             return original_output + lora_output
-        elif self.is_merge == False:
-            return self.original_layer(input_)
         else:
-            return self.new_layer(input_)
+            return self.original_layer(input_)
 
     def merge(self):
         # merge the weight of lora and original layer 
         new_weights = tf.einsum("ab, bc -> ac", self.A.get_weights()[0], self.B.get_weights()[0])
         original_w, original_b = self.original_layer.get_weights()
         
-        new_layer = tf.keras.layers.Dense(self.original_layer_unit)
-        new_layer.build([tf.shape(original_w)[0]])
-        new_layer.set_weights([original_w + new_weights, original_b])
-        self.new_layer = new_layer
-        self.is_merge = True
+        self.original_layer.set_weights([original_w + new_weights, original_b])
 class GPUMemoryCallback(tf.keras.callbacks.Callback):
     def __init__(
         self,
