@@ -5,6 +5,13 @@ from lora import *
 from loader import *
 
 if __name__ == "__main__":
+    devices = tf.config.list_physical_devices('GPU')
+    try:
+        # Have to set this to full, cause tensorflow default use all vram
+        tf.config.experimental.set_memory_growth(devices, False)
+    except:
+        # Invalid device or cannot modify virtual devices once initialized.
+        pass
 
     MODEL_NAME = "distilbert-base-uncased"
     tkzr = DistilBertTokenizer.from_pretrained(MODEL_NAME)
@@ -29,9 +36,14 @@ if __name__ == "__main__":
     # vanila
     model = TFDistilBertForSequenceClassification.from_pretrained(MODEL_NAME)
     model.summary()
+    # Before the run, reset the momory stats
+    tf.config.experimental.reset_memory_stats(
+        "GPU:0"
+    )
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
     model.fit(train_data, epochs = 5, callbacks = [vanila_tracker])
     loss, acc = model.evaluate(test_data)
+
 
     # Lora finetune
     model = TFDistilBertForSequenceClassification.from_pretrained(MODEL_NAME)
@@ -65,6 +77,10 @@ if __name__ == "__main__":
                 layer.trainable = False
             
     model.summary()
+    # Before the run, reset the momory stats
+    tf.config.experimental.reset_memory_stats(
+        "GPU:0"
+    )
     model.compile(optimizer = "adam",loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits = True), metrics = ["accuracy"])
     model.fit(train_data, epochs = 5 , callbacks = [lora_tracker])
     loss, acc = model.evaluate(test_data)
