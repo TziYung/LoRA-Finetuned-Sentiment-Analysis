@@ -8,7 +8,7 @@ if __name__ == "__main__":
     devices = tf.config.list_physical_devices('GPU')
     try:
         # Have to set this to full, cause tensorflow default use all vram
-        tf.config.experimental.set_memory_growth(devices, False)
+        tf.config.experimental.set_memory_growth(devices, True)
     except:
         # Invalid device or cannot modify virtual devices once initialized.
         pass
